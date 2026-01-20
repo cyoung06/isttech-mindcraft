@@ -1,0 +1,46 @@
+{
+    "name": "andy",
+
+    "model": "gemini-3-flash-preview",
+
+    "coding_examples": [
+        [
+            {"role": "user", "content": "Collect 10 wood"},
+            {"role": "assistant", "content": "```javascript\nawait skills.collectBlock(bot, 'oak_log', 10);\n```"}
+        ],
+        [
+            {"role": "user", "content": "Come here"},
+            {"role": "assistant", "content": "```javascript\nconst target = bot.players['Steve']?.entity;\nif (target) {\n    await skills.goToPosition(bot, target.position.x, target.position.y, target.position.z, 1);\n}\n```"}
+        ],
+        [
+            {
+                "role": "user",
+                "content": "Look around and see if you can find a plane shape."
+            },
+            {
+                "role": "assistant",
+                "content": "I will scan the surroundings specifically looking for a plane shape. !panoramicScan(\"plane shape or structure resembling an airplane\")"
+            }
+        ],
+        [
+            {
+                "role": "user",
+                "content": "Take a look around the room and tell me what you see."
+            },
+            {
+                "role": "assistant",
+                "content": "I'll perform a panoramic scan to describe the environment. !panoramicScan(\"\")"
+            }
+        ],
+        [
+            {
+                "role": "user",
+                "content": "Go to the block that is furthest to the right within my field of view."
+            },
+            {
+                "role": "assistant",
+                "content": "```javascript\n// 1. Calculate direction vectors based on bot's Yaw\n// In Mineflayer, Yaw 0=South(+Z), -PI/2=East(+X)\nconst yaw = bot.entity.yaw;\n// Right direction vector: (-cos(yaw), 0, -sin(yaw))\nconst rightVec = new Vec3(-Math.cos(yaw), 0, -Math.sin(yaw));\n// Forward direction vector: (-sin(yaw), 0, Math.cos(yaw))\nconst lookVec = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw));\n\n// 2. Get blocks within 10 blocks radius\nconst blocks = world.getNearestBlocks(bot, null, 10);\n\nlet targetBlock = null;\nlet maxRightness = -Infinity;\nconst botPos = bot.entity.position.offset(0, 1.6, 0); // Bot's eye level\n\nfor (const block of blocks) {\n    // Skip air, water, or lava\n    if (block.name === 'air' || block.name === 'water' || block.name === 'lava') continue;\n\n    const blockCenter = block.position.offset(0.5, 0.5, 0.5);\n    const toBlock = blockCenter.minus(botPos);\n    const dist = toBlock.norm();\n\n    // Exclude blocks too close (min 2 blocks distance) to avoid looking at feet\n    if (dist < 2) continue;\n\n    const dir = toBlock.normalize();\n\n    // 3. Field of View filtering (Check if in front)\n    // Dot product > 0.5 means roughly within 60 degrees in front\n    if (dir.dot(lookVec) < 0.5) continue;\n\n    // 4. Calculate 'rightness' (Project onto right vector)\n    const rightness = dir.dot(rightVec);\n    \n    // Select the block with the highest rightness score\n    if (rightness > maxRightness) {\n        maxRightness = rightness;\n        targetBlock = block;\n    }\n}\n\n// 5. Execute movement\nif (targetBlock) {\n    bot.chat(`Found ${targetBlock.name} to the far right! Moving there.`);\n    // Move to the top of the block\n    const dest = targetBlock.position.offset(0.5, 1, 0.5);\n    await skills.goToPosition(bot, dest.x, dest.y, dest.z, 0.5);\n} else {\n    bot.chat(\"Could not find any suitable block in the right field of view.\");\n}\n```"
+            }
+        ]
+    ]
+}

@@ -1,0 +1,13 @@
+diff --git a/node_modules/patch-package/dist/makePatch.js b/node_modules/patch-package/dist/makePatch.js
+index a240b7e..61a5daf 100644
+--- a/node_modules/patch-package/dist/makePatch.js
++++ b/node_modules/patch-package/dist/makePatch.js
+@@ -155,7 +155,7 @@ function makePatch({ packagePathSpecifier, appPath, packageManager, includePaths
+         const git = (...args) => spawnSafe_1.spawnSafeSync("git", args, {
+             cwd: tmpRepo.name,
+             env: Object.assign(Object.assign({}, process.env), { HOME: tmpRepo.name }),
+-            maxBuffer: 1024 * 1024 * 100,
++            maxBuffer: 1024 * 1024 * 400,
+         });
+         // remove nested node_modules just to be safe
+         fs_extra_1.removeSync(path_1.join(tmpRepoPackagePath, "node_modules"));

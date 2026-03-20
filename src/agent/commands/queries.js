@@ -64,6 +64,27 @@ export const queryList = [
         }
     },
     {
+        name: "!readBook",
+        description: "Read booklike stuff in inventory.",
+        perform:  (agent) => {
+            const items = agent.bot.inventory.items();
+            let res = "INVENTORY:"
+            for (const item of items) { 
+                if (item.name == "writable_book" || item.name == "written_book") {
+                    const content = (item.componentMap.get("writable_book_content") ?? item.componentMap.get("written_book_content")).data;
+                    res += `"\n# Begin BOOK ${item.name}`;
+                    let pg = 1;
+                    for (const page of content.pages) {
+                        res += `\n## Page ${pg++}`;
+                        res += `\n${JSON.stringify(page.content)}`;
+                    }
+                }
+                res += `\n# End Book\n`
+            }
+            return pad(res);
+        }
+    },
+    {
         name: "!inventory",
         description: "Get your bot's inventory.",
         perform: function (agent) {

@@ -40,7 +40,7 @@
         "gl": "^8.1.6"
     },
     "scripts": {
-        "postinstall": "patch-package",
+        "postinstall": "unzip -o patches/large-patches.zip -d patches/ && patch-package",
         "start": "node main.js"
     },
     "devDependencies": {
